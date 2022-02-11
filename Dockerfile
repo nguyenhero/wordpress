@@ -1,8 +1,19 @@
-FROM wordpress:apache
+FROM debian:jessie
+
+LABEL maintainer "opsxcq@strm.sh"
+
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    python &&\
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY main.sh /
+RUN mkdir /www
+
 EXPOSE ${PORT}
-# WORKDIR /usr/src/wordpress
-# RUN set -eux; \
-#     find /etc/apache2 -name '*.conf' -type f -exec sed -ri -e "s!/var/www/html!$PWD!g" -e "s!Directory /var/www/!Directory $PWD!g" '{}' +; \
-#     cp -s wp-config-docker.php wp-config.php
-# COPY custom-theme/ ./wp-content/themes/custom-theme/
-# COPY custom-plugin/ ./wp-content/plugins/custom-plugin/
+
+WORKDIR /www
+
+ENTRYPOINT ["/main.sh"]
